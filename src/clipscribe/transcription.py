@@ -114,7 +114,8 @@ def transcribe(
     try:
         gpu_model = _new_model(model_name, device="cuda")
         return _run_transcription(gpu_model, source, language)
-    except Exception as gpu_error:
+    # Native backend failures vary by CUDA driver, library, and device setup.
+    except Exception as gpu_error:  # noqa: BLE001
         try:
             cpu_model = _new_model(model_name, device="cpu")
             return _run_transcription(cpu_model, source, language)

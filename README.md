@@ -6,7 +6,7 @@ Local-first subtitles for Greek and other languages. The v0.1.0 goal is a local 
 
 ## Status
 
-Planning and repository setup. See [Roadmap](docs/ROADMAP.md) and [LEARNINGS.md](LEARNINGS.md).
+Core library in progress: audio extraction, word-timed transcription, and subtitle segmentation. See [Roadmap](docs/ROADMAP.md) and [LEARNINGS.md](LEARNINGS.md).
 
 ## Development setup
 
@@ -28,13 +28,13 @@ To exercise the current library code from a Python shell:
 from pathlib import Path
 from clipscribe.audio import extract_audio
 from clipscribe.transcription import transcribe
+from clipscribe.segmenter import segment_words
 
 audio_path = extract_audio(Path("input.mp4"), Path("work/input.wav"))
 result = transcribe(audio_path, model_name="small", language="el")
-for segment in result.segments:
-    print(segment.start, segment.end, segment.text)
-    for word in segment.words:
-        print("  ", word.start, word.end, word.text)
+words = tuple(word for segment in result.segments for word in segment.words)
+for cue in segment_words(words):
+    print(cue.start, cue.end, cue.text)
 ```
 
 The first transcription downloads the selected model to the faster-whisper cache. Once downloaded, transcription can run offline. A web app and direct run command are not available yet; the HTTP API and editor arrive later in the plan.

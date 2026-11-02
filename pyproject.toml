@@ -33,3 +33,7 @@ src = ["src", "tests"]
 python_version = "3.11"
 mypy_path = "src"
 strict = true
+
+[[tool.mypy.overrides]]
+module = ["faster_whisper"]
+ignore_missing_imports = true
