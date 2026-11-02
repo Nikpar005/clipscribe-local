@@ -10,7 +10,7 @@ The local backend, upload flow, transcript editor, SRT export, and segmentation 
 
 ### Windows, without Docker
 
-Install FFmpeg and Node.js 24 once, then double-click `start-local.ps1` (or run it in PowerShell from this folder). On its first run, it prepares the Python and web packages; after that it opens the app at [http://localhost:5173](http://localhost:5173). Two terminal windows stay open while the app runs; close both to stop it. Python 3.14 is supported.
+Install FFmpeg and Node.js 24 once, then double-click `start-local.cmd`. On its first run, it prepares the Python and web packages; after that it opens the app at [http://localhost:5173](http://localhost:5173). Two terminal windows stay open while the app runs; close both to stop it. Python 3.14 is supported.
 
 ### Docker Desktop
 
