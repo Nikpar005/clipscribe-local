@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local application data and downloaded models
+data/
+models/
+*.db
+*.sqlite3
+benchmarks/corpus/local/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env*
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
