@@ -10,17 +10,35 @@ Planning and repository setup. See [Roadmap](docs/ROADMAP.md) and [LEARNINGS.md]
 
 ## Development setup
 
-Prerequisites: Git, Python 3.11 or 3.12 (dependency compatibility will be checked before choosing), Node.js LTS, and Docker Desktop for the later container workflow.
+Prerequisites for the current audio pipeline: Git, 64-bit Python 3.11, and FFmpeg on `PATH`. Python 3.11 is the conservative choice because the current faster-whisper project declares Python 3.9+ and CTranslate2 publishes a Windows CPython 3.11 wheel. CUDA 12 and cuDNN 9 are needed for faster-whisper GPU inference; without them the code falls back to CPU int8. Docker Desktop and Node.js are needed in later steps, not for this library code.
 
 ```powershell
 git clone <repository-url>
 cd clipscribe-local
-py -3.11 -m venv .venv
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+ffmpeg -version
+python -m pytest
 ```
 
-The project dependencies and first runnable command will be added in the relevant implementation steps. This scaffold does not yet claim to run the application.
+To exercise the current library code from a Python shell:
+
+```python
+from pathlib import Path
+from clipscribe.audio import extract_audio
+from clipscribe.transcription import transcribe
+
+audio_path = extract_audio(Path("input.mp4"), Path("work/input.wav"))
+result = transcribe(audio_path, model_name="small", language="el")
+for segment in result.segments:
+    print(segment.start, segment.end, segment.text)
+    for word in segment.words:
+        print("  ", word.start, word.end, word.text)
+```
+
+The first transcription downloads the selected model to the faster-whisper cache. Once downloaded, transcription can run offline. A web app and direct run command are not available yet; the HTTP API and editor arrive later in the plan.
 
 ## Architecture
 
