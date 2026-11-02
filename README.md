@@ -10,11 +10,11 @@ Planning and repository setup. See [Roadmap](docs/ROADMAP.md) and [LEARNINGS.md]
 
 ## Development setup
 
-Prerequisites for the current audio pipeline: Git, 64-bit Python 3.11, and FFmpeg on `PATH`. Python 3.11 is the conservative choice because the current faster-whisper project declares Python 3.9+ and CTranslate2 publishes a Windows CPython 3.11 wheel. CUDA 12 and cuDNN 9 are needed for faster-whisper GPU inference; without them the code falls back to CPU int8. Docker Desktop and Node.js are needed in later steps, not for this library code. If you have several Python versions, use the Windows launcher to select 3.11 explicitly.
+Prerequisites for the current audio pipeline: Git, 64-bit Python 3.11–3.14, and FFmpeg on `PATH`. Python 3.14 has Windows wheels for CTranslate2, PyAV, and ONNX Runtime. The project pins PyAV below 19 because PyAV 19 changed an API that the current faster-whisper release still uses. CUDA 12 and cuDNN 9 are needed for faster-whisper GPU inference; without them the code falls back to CPU int8. Docker Desktop and Node.js are needed in later steps, not for this library code.
 
 ```powershell
 # Run these commands from the clipscribe-local repository root.
-py -3.11 -m venv .venv
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
