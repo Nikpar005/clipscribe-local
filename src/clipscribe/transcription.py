@@ -94,7 +94,7 @@ def _run_transcription(
 def transcribe(
     audio_path: Path,
     *,
-    model_name: str = "small",
+    model_name: str = "large-v3-turbo",
     language: str = "el",
     device: Literal["auto", "cpu"] = "auto",
 ) -> TranscriptionResult:

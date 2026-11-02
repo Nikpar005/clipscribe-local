@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -96,3 +97,40 @@ def test_overlapping_cues_are_rejected(tmp_path: Path) -> None:
             },
         )
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("configured_model", "expected_model"),
+    [(None, "large-v3-turbo"), ("small", "small")],
+)
+def test_model_default_and_environment_override(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    configured_model: str | None,
+    expected_model: str,
+) -> None:
+    if configured_model is None:
+        monkeypatch.delenv("CLIPSCRIBE_MODEL", raising=False)
+    else:
+        monkeypatch.setenv("CLIPSCRIBE_MODEL", configured_model)
+    captured_models: list[str] = []
+
+    def capture_model(job_id: str, *, sessions: sessionmaker[Session], jobs_dir: Path) -> None:
+        with sessions() as session:
+            job = session.get(Job, job_id)
+            assert job is not None
+            captured_models.append(job.model_name)
+
+    app = create_app(
+        database_url=f"sqlite:///{(tmp_path / 'models.sqlite3').as_posix()}",
+        data_dir=tmp_path,
+        processor=capture_model,
+    )
+    with TestClient(app) as client:
+        response = client.post(
+            "/jobs",
+            files={"video": ("sample.mp4", b"video", "video/mp4")},
+        )
+
+    assert response.status_code == 202
+    assert captured_models == [expected_model]

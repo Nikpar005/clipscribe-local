@@ -7,7 +7,7 @@ services:
     environment:
       CLIPSCRIBE_DATA_DIR: /app/data
       CLIPSCRIBE_DATABASE_URL: sqlite:////app/data/clipscribe.sqlite3
-      CLIPSCRIBE_MODEL: small
+      CLIPSCRIBE_MODEL: large-v3-turbo
       HF_HOME: /models
       HF_HUB_CACHE: /models/hub
     volumes:

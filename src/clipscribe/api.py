@@ -57,7 +57,7 @@ def create_app(
         or f"sqlite:///{(root / 'clipscribe.sqlite3').as_posix()}"
     )
     sessions = make_engine(url, data_dir=root)
-    model_name = os.getenv("CLIPSCRIBE_MODEL", "small")
+    model_name = os.getenv("CLIPSCRIBE_MODEL", "large-v3-turbo")
     app = FastAPI(title="clipscribe-local", version="0.1.0")
     app.state.sessions = sessions
 

@@ -24,7 +24,7 @@ docker compose up --build
 
 Open [http://localhost:8080](http://localhost:8080). The API documentation is at [http://localhost:8000/docs](http://localhost:8000/docs).
 
-Docker Desktop must be installed and running. The first transcription downloads the configured Whisper model into the `clipscribe-models` volume; once downloaded, the app can transcribe offline. User videos and SQLite data live in the separate `clipscribe-data` volume. The model is not included in the image.
+Docker Desktop must be installed and running. The default `large-v3-turbo` Whisper model downloads on first transcription into the `clipscribe-models` volume; once downloaded, the app can transcribe offline. User videos and SQLite data live in the separate `clipscribe-data` volume. The model is not included in the image. You can select another faster-whisper model by setting `CLIPSCRIBE_MODEL` before starting the app.
 
 The clone URL above needs the GitHub account name that will own the public repository. The current local repository has no Git remote yet.
 
@@ -58,6 +58,19 @@ npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) for the development UI. The Vite dev server proxies API requests to port 8000.
+
+The default transcription model is `large-v3-turbo`, which is more capable than `small` while keeping inference fast on a supported GPU. The model is downloaded on first use. For a higher-accuracy, slower alternative, select `large-v3` before starting the Windows launcher:
+
+```powershell
+$env:CLIPSCRIBE_MODEL = "large-v3"
+.\start-local.cmd
+```
+
+The choice is configurable because accuracy and speed depend on the recording; review and correct the transcript before exporting.
+
+## Fonts
+
+Style 2.0 self-hosts Manrope and JetBrains Mono through Fontsource. Both font packages include Greek and Latin subsets and use the SIL Open Font License; the license copies ship in `frontend/public/licenses/`.
 
 ## Architecture
 
