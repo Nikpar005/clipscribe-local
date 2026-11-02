@@ -6,6 +6,20 @@ Local-first subtitles for Greek and other languages. Upload a video, review the 
 
 The local backend, upload flow, transcript editor, SRT export, and segmentation are implemented. A real-video run and benchmark numbers are still pending a suitable sample file. See [Roadmap](docs/ROADMAP.md) and [LEARNINGS.md](LEARNINGS.md).
 
+## Screenshots
+
+### Upload
+
+![ClipScribe upload screen](docs/screenshots/landing.png)
+
+### Processing
+
+![ClipScribe processing screen](docs/screenshots/processing.png)
+
+### Subtitle editor
+
+![ClipScribe subtitle editor](docs/screenshots/editor.png)
+
 ## Quick Start
 
 ### Windows, without Docker
