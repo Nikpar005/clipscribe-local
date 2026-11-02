@@ -1,10 +1,12 @@
 # clipscribe-local
 
+![ClipScribe Local brand preview](frontend/public/brand/social-preview.png)
+
 Local-first subtitles for Greek and other languages. Upload a video, review the word-timed transcript in your browser, correct it, and export readable SRT subtitles. The video and transcript stay on your computer.
 
 ## Status
 
-The local backend, upload flow, transcript editor, SRT export, and segmentation are implemented. A real-video run and benchmark numbers are still pending a suitable sample file. See [Roadmap](docs/ROADMAP.md) and [LEARNINGS.md](LEARNINGS.md).
+The local backend, upload flow, transcript editor, SRT export, and segmentation are implemented. Initial informal testing suggests Greek transcripts are generally faithful to the speech, with further refinement still needed. Formal benchmark results are pending.
 
 ## Screenshots
 
@@ -86,6 +88,10 @@ The choice is configurable because accuracy and speed depend on the recording; r
 
 Style 2.0 self-hosts Manrope and JetBrains Mono through Fontsource. Both font packages include Greek and Latin subsets and use the SIL Open Font License; the license copies ship in `frontend/public/licenses/`.
 
+## Brand assets
+
+The light and dark wordmarks, app mark, favicon, and social-preview image are in `frontend/public/brand/` and `frontend/public/favicon.svg`.
+
 ## Architecture
 
 ```mermaid
@@ -110,13 +116,17 @@ After creating `benchmarks/corpus/local/sample.tsv`, run:
 python benchmarks/run.py --models tiny,base,small --device auto --output benchmarks/local-results.md
 ```
 
+## Measurements
+
+An initial informal check found the Greek output fairly faithful to the spoken content. ClipScribe is still at an early stage and needs further work and testing across more voices, recording conditions, and speaking styles. This is a qualitative observation, not a measured accuracy percentage; formal WER results are not available yet.
+
 ## Benchmarks
 
-No measurements yet. `benchmarks/run.py` reports WER and real-time factor per model. It excludes model loading and first-run downloads from RTF. Add results only after running it against checked references, and include the machine, compute mode, and model settings.
+`benchmarks/run.py` reports WER and real-time factor per model. It excludes model loading and first-run downloads from RTF. Add results only after running it against checked references, and include the machine, compute mode, and model settings.
 
 ## Limitations
 
-Greek accuracy has not been measured on this project’s sample yet. Names, slang, code-switching, overlapping speakers, music, and noisy audio can reduce transcription quality. The default background task runs inside the API process; a process restart can interrupt queued work. The app is intended for one user on one computer and has no login or multi-user controls. Docker Compose uses CPU inference by default; GPU acceleration depends on the host's NVIDIA runtime and compatible CUDA/cuDNN libraries.
+Formal Greek WER has not been measured on a hand-checked corpus yet. Names, slang, code-switching, overlapping speakers, music, and noisy audio can reduce transcription quality. The default background task runs inside the API process; a process restart can interrupt queued work. The app is intended for one user on one computer and has no login or multi-user controls. Docker Compose uses CPU inference by default; GPU acceleration depends on the host's NVIDIA runtime and compatible CUDA/cuDNN libraries.
 
 ## Roadmap
 

@@ -132,7 +132,7 @@ export default function App() {
     <main className="shell">
       <header className="topbar">
         <a className="brand" href="#top" aria-label="ClipScribe Local home">
-          <span className="brand-mark">C</span>
+          <img className="brand-mark" src="/brand/clipscribe-mark.svg" alt="" />
           <span>clipscribe<span className="brand-light">.local</span></span>
         </a>
         <span className="privacy-pill"><span className="privacy-dot" /> Private by design</span>

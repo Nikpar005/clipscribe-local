@@ -92,16 +92,11 @@ a {
 }
 
 .brand-mark {
-  display: grid;
+  display: block;
   width: 30px;
   height: 30px;
-  place-items: center;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-size: 15px;
-  font-weight: 800;
+  border-radius: 8px;
+  object-fit: contain;
 }
 
 .brand-light {
