@@ -1,69 +1,95 @@
 # clipscribe-local
 
-Local-first subtitles for Greek and other languages. The v0.1.0 goal is a local pipeline that transcribes a video, lets you review and correct timed words, and exports readable SRT subtitles.
-
-> Day 1 scaffold. Setup instructions, measured benchmarks, and supported hardware will be filled in as they are verified. No benchmark results are claimed yet.
+Local-first subtitles for Greek and other languages. Upload a video, review the word-timed transcript in your browser, correct it, and export readable SRT subtitles. The video and transcript stay on your computer.
 
 ## Status
 
-Core library in progress: audio extraction, word-timed transcription, and subtitle segmentation. See [Roadmap](docs/ROADMAP.md) and [LEARNINGS.md](LEARNINGS.md).
+The local backend, upload flow, transcript editor, SRT export, and segmentation are implemented. A real-video run and benchmark numbers are still pending a suitable sample file. See [Roadmap](docs/ROADMAP.md) and [LEARNINGS.md](LEARNINGS.md).
+
+## Quick Start
+
+### Windows, without Docker
+
+Install FFmpeg and Node.js 24 once, then double-click `start-local.ps1` (or run it in PowerShell from this folder). On its first run, it prepares the Python and web packages; after that it opens the app at [http://localhost:5173](http://localhost:5173). Two terminal windows stay open while the app runs; close both to stop it. Python 3.14 is supported.
+
+### Docker Desktop
+
+After the repository has been published to GitHub, clone it and start the local app:
+
+```powershell
+git clone https://github.com/<your-account>/clipscribe-local.git
+cd clipscribe-local
+docker compose up --build
+```
+
+Open [http://localhost:8080](http://localhost:8080). The API documentation is at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+Docker Desktop must be installed and running. The first transcription downloads the configured Whisper model into the `clipscribe-models` volume; once downloaded, the app can transcribe offline. User videos and SQLite data live in the separate `clipscribe-data` volume. The model is not included in the image.
+
+The clone URL above needs the GitHub account name that will own the public repository. The current local repository has no Git remote yet.
 
 ## Development setup
 
-Prerequisites for the current audio pipeline: Git, 64-bit Python 3.11–3.14, and FFmpeg on `PATH`. Python 3.14 has Windows wheels for CTranslate2, PyAV, and ONNX Runtime. The project pins PyAV below 19 because PyAV 19 changed an API that the current faster-whisper release still uses. CUDA 12 and cuDNN 9 are needed for faster-whisper GPU inference; without them the code falls back to CPU int8. Docker Desktop and Node.js are needed in later steps, not for this library code.
+Prerequisites: Git, 64-bit Python 3.11–3.14, FFmpeg, and Node.js 24. Python 3.14 works with the current CTranslate2 and PyAV wheels. PyAV is pinned below 19 because the current faster-whisper release calls an API removed in PyAV 19. GPU inference requires compatible NVIDIA CUDA and cuDNN libraries; if CUDA setup fails, transcription falls back to CPU int8.
 
 ```powershell
-# Run these commands from the clipscribe-local repository root.
+# In the repository root:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ffmpeg -version
 python -m pytest
+ruff check .
+mypy src
 ```
 
-To exercise the current library code from a Python shell:
+Start the API and frontend in separate terminals:
 
-```python
-from pathlib import Path
-from clipscribe.audio import extract_audio
-from clipscribe.transcription import transcribe
-from clipscribe.segmenter import segment_words
-
-audio_path = extract_audio(Path("input.mp4"), Path("work/input.wav"))
-result = transcribe(audio_path, model_name="small", language="el")
-words = tuple(word for segment in result.segments for word in segment.words)
-for cue in segment_words(words):
-    print(cue.start, cue.end, cue.text)
+```powershell
+# Repository root; leave this terminal running.
+uvicorn clipscribe.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-The first transcription downloads the selected model to the faster-whisper cache. Once downloaded, transcription can run offline. A web app and direct run command are not available yet; the HTTP API and editor arrive later in the plan.
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) for the development UI. The Vite dev server proxies API requests to port 8000.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
     Browser[React editor] --> API[FastAPI]
-    API --> Worker[Local background worker]
-    Worker --> FFmpeg[Audio extraction]
-    FFmpeg --> Whisper[faster-whisper]
-    Whisper --> Segmenter[Subtitle segmentation]
-    API --> DB[(SQLite)]
+    API --> Worker[In-process background task]
+    Worker --> FFmpeg[FFmpeg audio extraction]
+    FFmpeg --> Whisper[faster-whisper word timestamps]
+    Whisper --> Segmenter[Pure subtitle segmenter]
+    API --> DB[(SQLite job and transcript data)]
     Segmenter --> DB
     DB --> Export[SRT export]
 ```
 
 ## Evaluation data
 
-The planned initial benchmark uses 8 locally selected Greek utterances from Mozilla Common Voice Scripted Speech. The corpus has not been downloaded or checked yet. Follow `benchmarks/corpus/README.md` for the official source, listening checks, and local-only data rules. The Mozilla Data Collective listing says the dataset is CC0-1.0 and also forbids re-hosting or re-sharing it, so the downloaded archive, extracted audio, and source transcript rows must stay out of Git. Benchmark setup therefore requires a separate official download and is not ready from a clean clone. This read-speech sample does not represent spontaneous video speech.
+The benchmark runner reads a local TSV manifest containing `audio_path` and hand-checked `reference` columns. See `benchmarks/corpus/README.md` for the intended Common Voice Greek source, access steps, and local-only data rules. Mozilla Data Collective permits computational use under CC0 but forbids re-hosting or re-sharing its dataset, so the downloaded archive, audio, and source transcript rows stay out of Git. This corpus is scripted read speech and does not represent spontaneous creator video speech.
+
+After creating `benchmarks/corpus/local/sample.tsv`, run:
+
+```powershell
+python benchmarks/run.py --models tiny,base,small --device auto --output benchmarks/local-results.md
+```
 
 ## Benchmarks
 
-No measurements yet. Results will be recorded from real runs in `benchmarks/RESULTS.md`; the benchmark script will report real-time factor and WER for the selected models.
+No measurements yet. `benchmarks/run.py` reports WER and real-time factor per model. It excludes model loading and first-run downloads from RTF. Add results only after running it against checked references, and include the machine, compute mode, and model settings.
 
 ## Limitations
 
-Not measured yet. Greek accuracy, hardware needs, and failure cases such as names, slang, and noisy audio will be documented from actual testing before v0.1.0.
+Greek accuracy has not been measured on this project’s sample yet. Names, slang, code-switching, overlapping speakers, music, and noisy audio can reduce transcription quality. The default background task runs inside the API process; a process restart can interrupt queued work. The app is intended for one user on one computer and has no login or multi-user controls. Docker Compose uses CPU inference by default; GPU acceleration depends on the host's NVIDIA runtime and compatible CUDA/cuDNN libraries.
 
 ## Roadmap
 

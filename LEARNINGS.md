@@ -17,3 +17,10 @@
 - A greedy segmenter can stay deterministic and pure while preferring punctuation and pauses at feasible cue boundaries.
 - Character-per-second and minimum-duration targets may need cue ends to extend into silence; word timing and non-overlap limit how far they can extend.
 - Keep line length, cue duration, reading speed, and pause thresholds configurable so Greek sample review can guide tuning instead of guessing permanently.
+
+## Day 4
+
+- Keep upload, processing status, transcript editing, and SRT export behind a small local API; the browser editor can then stay simple and focused.
+- Local background work is convenient for a one-person desktop app, but a process restart loses in-flight work; persisted job state makes that limitation visible.
+- GPU capability varies by installed CUDA and cuDNN libraries, so report the compute mode and preserve a CPU fallback instead of assuming the laptop GPU is ready.
+- A benchmark runner should keep audio and reference text local, and report WER and real-time factor only from measured, checked samples.

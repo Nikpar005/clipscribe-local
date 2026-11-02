@@ -1,0 +1,46 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    environment:
+      CLIPSCRIBE_DATA_DIR: /app/data
+      CLIPSCRIBE_DATABASE_URL: sqlite:////app/data/clipscribe.sqlite3
+      CLIPSCRIBE_MODEL: small
+      HF_HOME: /models
+      HF_HUB_CACHE: /models/hub
+    volumes:
+      - clipscribe-data:/app/data
+      - clipscribe-models:/models
+    expose:
+      - "8000"
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+
+volumes:
+  clipscribe-data:
+  clipscribe-models:

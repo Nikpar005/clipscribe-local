@@ -9,4 +9,15 @@ Before opening a change:
 3. For benchmark changes, record the exact model, settings, hardware, and command; never estimate results.
 4. Confirm that any media or reference transcript you contribute is legally redistributable.
 
-Development commands will be documented here as the project tooling is added.
+## Development
+
+Use Python 3.11–3.14, FFmpeg, and Node.js 24. See the README for first-time setup and the Windows launcher. From the repository root, run:
+
+```powershell
+python -m pip install -e ".[dev]"
+python -m pytest
+ruff check .
+mypy src
+```
+
+Build the browser app from `frontend/` with `npm ci` and `npm run build`. Docker Compose is also available for a local deployment.

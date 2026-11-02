@@ -18,6 +18,7 @@ benchmarks/corpus/local/
 frontend/node_modules/
 frontend/dist/
 frontend/.env*
+frontend/*.tsbuildinfo
 
 # Editors and OS
 .vscode/
