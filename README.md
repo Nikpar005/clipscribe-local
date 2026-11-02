@@ -31,7 +31,7 @@ Install FFmpeg and Node.js 24 once, then double-click `start-local.cmd`. On its 
 After the repository has been published to GitHub, clone it and start the local app:
 
 ```powershell
-git clone https://github.com/<your-account>/clipscribe-local.git
+git clone https://github.com/Nikpar005/clipscribe-local.git
 cd clipscribe-local
 docker compose up --build
 ```
@@ -40,7 +40,7 @@ Open [http://localhost:8080](http://localhost:8080). The API documentation is at
 
 Docker Desktop must be installed and running. The default `large-v3-turbo` Whisper model downloads on first transcription into the `clipscribe-models` volume; once downloaded, the app can transcribe offline. User videos and SQLite data live in the separate `clipscribe-data` volume. The model is not included in the image. You can select another faster-whisper model by setting `CLIPSCRIBE_MODEL` before starting the app.
 
-The clone URL above needs the GitHub account name that will own the public repository. The current local repository has no Git remote yet.
+The public repository is [Nikpar005/clipscribe-local](https://github.com/Nikpar005/clipscribe-local).
 
 ## Development setup
 
